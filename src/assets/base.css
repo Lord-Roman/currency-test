@@ -95,7 +95,7 @@ ul {
 }
 
 a {
-  color: #3eaf7c;
+  color: var(--money-green);
   font-weight: 500;
   text-decoration: none;
 }

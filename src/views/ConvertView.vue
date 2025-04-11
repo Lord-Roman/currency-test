@@ -112,9 +112,13 @@ input[type='number']::-webkit-inner-spin-button {
 .exchange {
   border: 1px solid var(--vt-c-divider-dark-1);
   display: inline-flex;
-  border-radius: 12px;
+  border-radius: 8px;
   background: #fff;
   transition: 0.3s;
+  caret-color: var(--money-green);
+  &::selection {
+    background: var(--money-green);
+  }
 
   &:hover {
     border-color: #000;
@@ -131,7 +135,8 @@ input[type='number']::-webkit-inner-spin-button {
     padding: 8px 12px;
   }
   &__currency-state {
-    padding-left: 24px;
+    padding-left: 16px;
+    margin-right: 8px;
     cursor: pointer;
   }
 }

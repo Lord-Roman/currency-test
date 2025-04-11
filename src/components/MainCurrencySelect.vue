@@ -21,7 +21,7 @@ const onChange = (event) => {
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  caret-color: #3eaf7c;
+  caret-color: var(--money-green);
   color: #2c3e50;
   outline: none;
   &:open {

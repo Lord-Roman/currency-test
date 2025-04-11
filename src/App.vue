@@ -49,7 +49,7 @@ nav {
       bottom: -2px;
       height: 2px;
       width: 0%;
-      background: #3eaf7c;
+      background: var(--money-green);
       transition: 0s;
     }
     &::before {
@@ -59,7 +59,7 @@ nav {
       bottom: -2px;
       height: 2px;
       width: 0%;
-      background: #3eaf7c;
+      background: var(--money-green);
       transition: 0.3s;
     }
     &:hover {
@@ -73,7 +73,7 @@ nav {
       }
     }
     &.router-link-active {
-      color: #3eaf7c;
+      color: var(--money-green);
     }
   }
 }
