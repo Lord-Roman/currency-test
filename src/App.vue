@@ -1,85 +1,92 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
+    <div class="container topmenu">
       <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/" class="topmenu__link">Главная</RouterLink>
+        <RouterLink to="/convert" class="topmenu__link">Конвертация</RouterLink>
       </nav>
+      <div class="topmenu__currency">
+        <MainCurrencySelect></MainCurrencySelect>
+      </div>
     </div>
   </header>
-
-  <RouterView />
+  <main>
+    <div class="container content">
+      <RouterView />
+    </div>
+  </main>
 </template>
 
-<style scoped>
+<script setup lang="ts">
+import { RouterLink, RouterView } from 'vue-router'
+import MainCurrencySelect from '@/components/MainCurrencySelect.vue'
+</script>
+
+<style lang="scss" scoped>
 header {
-  line-height: 1.5;
-  max-height: 100vh;
+  padding-block: 1.2rem;
+  background-color: #fff;
+  box-shadow: 2px 3px 10px rgba(234, 236, 239, 1);
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
 nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  display: flex;
 }
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+.topmenu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  &__link {
+    position: relative;
+    padding: 12px;
+    border-bottom: 2px solid transparent;
+    color: var(--vt-c-indigo);
+    text-decoration: none;
+    transition: color 0.3s;
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      height: 2px;
+      width: 0%;
+      background: #3eaf7c;
+      transition: 0s;
+    }
+    &::before {
+      content: '';
+      position: absolute;
+      right: 0;
+      bottom: -2px;
+      height: 2px;
+      width: 0%;
+      background: #3eaf7c;
+      transition: 0.3s;
+    }
+    &:hover {
+      &::after {
+        transition: 0.3s;
+        width: 100%;
+      }
+      &::before {
+        transition: 0.3s 0.3s;
+        width: 100%;
+      }
+    }
+    &.router-link-active {
+      color: #3eaf7c;
+    }
   }
+}
+.content {
+  padding-block: 2.4rem;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+.navbar-menu {
+  list-style: none;
+  display: flex;
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.navbar-menu li {
+  margin-right: 2rem;
 }
 </style>
