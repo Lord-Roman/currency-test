@@ -85,7 +85,7 @@ const alphaCurrencyOnChange = async (event: Event): Promise<void> => {
 const omegaCurrencyOnChange = async (event: Event): Promise<void> => {
   omegaCurrencyState.value = (event.target as HTMLSelectElement).value
   await currencyOnChange()
-  omegaCurrencyInput()
+  alphaCurrencyInput()
 }
 
 const alphaCurrencyInput = (): void => {
