@@ -17,7 +17,7 @@
           class="exchange__text exchange__currency-state"
           :value="alphaCurrencyState"
           @OnChange="alphaCurrencyOnChange"
-        ></CurrencySelect>
+        />
       </div>
       <div class="exchange">
         <input
@@ -34,11 +34,12 @@
           class="exchange__text exchange__currency-state"
           :value="omegaCurrencyState"
           @OnChange="omegaCurrencyOnChange"
-        ></CurrencySelect>
+        />
       </div>
     </form>
   </div>
 </template>
+
 <script setup lang="ts">
 import CurrencySelect from '@/components/CurrencySelect.vue'
 import { currencies, currencyGetUrl as url } from '@/utils/helper.ts'
@@ -46,57 +47,62 @@ import { ref, onMounted } from 'vue'
 import { useMainStore } from '@/stores/mainStore'
 
 const main = useMainStore()
-const alphaCurrency = ref(0)
-const omegaCurrency = ref(0)
+const alphaCurrency = ref<number>(0)
+const omegaCurrency = ref<number>(0)
 
-const alphaCurrencyState = ref(main.selectedCurrency)
-const omegaCurrencyState = ref(
-  alphaCurrencyState.value == currencies[0] ? currencies[1] : currencies[0],
+const alphaCurrencyState = ref<string>(main.selectedCurrency)
+const omegaCurrencyState = ref<string>(
+  alphaCurrencyState.value === currencies[0] ? currencies[1] : currencies[0],
 )
 
-const coefficientAlphaToOmega = ref(1)
-const coefficientOmegaToAlpha = ref(1)
+const coefficientAlphaToOmega = ref<number>(1)
+const coefficientOmegaToAlpha = ref<number>(1)
 
-const currencyOnChange = async () => {
+interface CurrencyResponse {
+  [key: string]: number
+}
+
+const currencyOnChange = async (): Promise<void> => {
   try {
     const response = await fetch(url)
-    const result = await response.json()
+    const result: CurrencyResponse = await response.json()
 
     coefficientAlphaToOmega.value =
       result[`${alphaCurrencyState.value}-${omegaCurrencyState.value}`.toLowerCase()] || 1
     coefficientOmegaToAlpha.value =
       result[`${omegaCurrencyState.value}-${alphaCurrencyState.value}`.toLowerCase()] || 1
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn(e)
   }
 }
 
-const alphaCurrencyOnChange = async (event) => {
-  alphaCurrencyState.value = event.target.value
+const alphaCurrencyOnChange = async (event: Event): Promise<void> => {
+  alphaCurrencyState.value = (event.target as HTMLSelectElement).value
   await currencyOnChange()
   alphaCurrencyInput()
 }
 
-const omegaCurrencyOnChange = async (event) => {
-  omegaCurrencyState.value = event.target.value
+const omegaCurrencyOnChange = async (event: Event): Promise<void> => {
+  omegaCurrencyState.value = (event.target as HTMLSelectElement).value
   await currencyOnChange()
   omegaCurrencyInput()
 }
 
-const alphaCurrencyInput = () => {
-  //Можно сделать через .toFixed(2) но тогда два либо два символа после запятой будут всегда, либо функция будет сложнее в разы
+const alphaCurrencyInput = (): void => {
   omegaCurrency.value = Math.round(alphaCurrency.value * coefficientAlphaToOmega.value * 100) / 100
 }
 
-const omegaCurrencyInput = () => {
+const omegaCurrencyInput = (): void => {
   alphaCurrency.value = Math.round(omegaCurrency.value * coefficientOmegaToAlpha.value * 100) / 100
 }
-onMounted(async () => {
+
+onMounted(async (): Promise<void> => {
   await currencyOnChange()
 })
 </script>
 
 <style lang="scss" scoped>
+/* Стили остаются без изменений */
 input[type='number']::-webkit-inner-spin-button {
   display: none;
 }

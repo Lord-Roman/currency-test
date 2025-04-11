@@ -1,17 +1,25 @@
 <template>
-  <select @change="OnChange">
-    <option v-for="currency in currencies" :key="currency" :selected="currency == value">
+  <select @change="onChange">
+    <option v-for="currency in currencies" :key="currency" :selected="currency === value">
       {{ currency }}
     </option>
   </select>
 </template>
+
 <script setup lang="ts">
 import { currencies } from '@/utils/helper.ts'
 
-const emit = defineEmits(['OnChange'])
-defineProps(['value'])
+interface Props {
+  value: string
+}
 
-const OnChange = (event) => {
+const emit = defineEmits<{
+  (e: 'OnChange', event: Event): void
+}>()
+
+defineProps<Props>()
+
+const onChange = (event: Event) => {
   emit('OnChange', event)
 }
 </script>

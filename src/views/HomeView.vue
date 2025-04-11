@@ -10,47 +10,57 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { currencies, currencyGetUrl as url } from '@/utils/helper.ts'
 import { useMainStore } from '@/stores/mainStore'
 
+interface CurrencyVariant {
+  txt: string
+  value: number
+}
+
+interface CurrencyResponse {
+  [key: string]: number
+}
+
 const main = useMainStore()
-const variants = ref([])
-const selectedCurrency = ref('')
-const loading = ref(false)
+const variants = ref<CurrencyVariant[]>([])
+const selectedCurrency = ref<string>('')
+const loading = ref<boolean>(false)
 
-const otherCurrencies = () =>
-  currencies.filter((item) => {
-    return item != main.selectedCurrency
-  })
+const otherCurrencies = (): string[] =>
+  currencies.filter((item: string) => item !== main.selectedCurrency)
 
-const updateCurrency = async () => {
+const updateCurrency = async (): Promise<void> => {
   loading.value = true
   try {
     const response = await fetch(url)
-    const result = await response.json()
+    const result: CurrencyResponse = await response.json()
 
     variants.value = []
-    otherCurrencies().forEach((currency) => {
-      const item = {
-        value: result[`${currency}-${main.selectedCurrency}`.toLowerCase()],
+    otherCurrencies().forEach((currency: string) => {
+      const item: CurrencyVariant = {
+        value: result[`${currency}-${main.selectedCurrency}`.toLowerCase()] || 0,
         txt: currency,
       }
       variants.value.push(item)
     })
     selectedCurrency.value = main.selectedCurrency
     loading.value = false
-  } catch (e) {
+  } catch (e: unknown) {
     console.warn(e)
+    loading.value = false
   }
 }
 
 main.$subscribe(updateCurrency)
-onMounted(async () => {
+onMounted(async (): Promise<void> => {
   await updateCurrency()
 })
 </script>
+
 <style lang="scss" scoped>
 .home {
   position: relative;
