@@ -1,15 +1,15 @@
 <template>
-  <CurrencySelect class="select" :value="main.selectedCurrency" @onChange="onChange" />
+  <CurrencySelect class="select" :value="store.selectedCurrency" @onChange="onChange" />
 </template>
 
 <script setup lang="ts">
-import { useMainStore } from '@/stores/mainStore'
+import { useCurrencyStore } from '@/stores/currencyStore'
 import CurrencySelect from '@/components/CurrencySelect.vue'
 
-const main = useMainStore()
+const store = useCurrencyStore()
 
 const onChange = (event: Event) => {
-  main.selectedCurrency = (event.target as HTMLSelectElement).value
+  store.selectedCurrency = (event.target as HTMLSelectElement).value
 }
 </script>
 

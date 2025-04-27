@@ -44,13 +44,13 @@
 import CurrencySelect from '@/components/CurrencySelect.vue'
 import { currencies, currencyGetUrl as url } from '@/utils/helper.ts'
 import { ref, onMounted } from 'vue'
-import { useMainStore } from '@/stores/mainStore'
+import { useCurrencyStore } from '@/stores/currencyStore'
 
-const main = useMainStore()
+const store = useCurrencyStore()
 const alphaCurrency = ref<number>(0)
 const omegaCurrency = ref<number>(0)
 
-const alphaCurrencyState = ref<string>(main.selectedCurrency)
+const alphaCurrencyState = ref<string>(store.selectedCurrency)
 const omegaCurrencyState = ref<string>(
   alphaCurrencyState.value === currencies[0] ? currencies[1] : currencies[0],
 )

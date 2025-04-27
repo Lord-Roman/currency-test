@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { currencies, currencyGetUrl as url } from '@/utils/helper.ts'
-import { useMainStore } from '@/stores/mainStore'
+import { useCurrencyStore } from '@/stores/currencyStore'
 
 interface CurrencyVariant {
   txt: string
@@ -25,13 +25,13 @@ interface CurrencyResponse {
   [key: string]: number
 }
 
-const main = useMainStore()
+const store = useCurrencyStore()
 const variants = ref<CurrencyVariant[]>([])
 const selectedCurrency = ref<string>('')
 const loading = ref<boolean>(false)
 
 const otherCurrencies = (): string[] =>
-  currencies.filter((item: string) => item !== main.selectedCurrency)
+  currencies.filter((item: string) => item !== store.selectedCurrency)
 
 const updateCurrency = async (): Promise<void> => {
   loading.value = true
@@ -42,12 +42,12 @@ const updateCurrency = async (): Promise<void> => {
     variants.value = []
     otherCurrencies().forEach((currency: string) => {
       const item: CurrencyVariant = {
-        value: result[`${currency}-${main.selectedCurrency}`.toLowerCase()] || 0,
+        value: result[`${currency}-${store.selectedCurrency}`.toLowerCase()] || 0,
         txt: currency,
       }
       variants.value.push(item)
     })
-    selectedCurrency.value = main.selectedCurrency
+    selectedCurrency.value = store.selectedCurrency
     loading.value = false
   } catch (e: unknown) {
     console.warn(e)
@@ -55,7 +55,7 @@ const updateCurrency = async (): Promise<void> => {
   }
 }
 
-main.$subscribe(updateCurrency)
+store.$subscribe(updateCurrency)
 onMounted(async (): Promise<void> => {
   await updateCurrency()
 })
