@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import CurrencySelect from '@/components/CurrencySelect.vue'
-import { currencies, currencyGetUrl as url } from '@/utils/helper.ts'
+import { currencies } from '@/utils/helper.ts'
 import { ref, onMounted } from 'vue'
 import { useCurrencyStore } from '@/stores/currencyStore'
 
@@ -58,22 +58,13 @@ const omegaCurrencyState = ref<string>(
 const coefficientAlphaToOmega = ref<number>(1)
 const coefficientOmegaToAlpha = ref<number>(1)
 
-interface CurrencyResponse {
-  [key: string]: number
-}
-
 const currencyOnChange = async (): Promise<void> => {
-  try {
-    const response = await fetch(url)
-    const result: CurrencyResponse = await response.json()
+  await store.loadRates()
 
-    coefficientAlphaToOmega.value =
-      result[`${alphaCurrencyState.value}-${omegaCurrencyState.value}`.toLowerCase()] || 1
-    coefficientOmegaToAlpha.value =
-      result[`${omegaCurrencyState.value}-${alphaCurrencyState.value}`.toLowerCase()] || 1
-  } catch (e: unknown) {
-    console.warn(e)
-  }
+  coefficientAlphaToOmega.value =
+    store.getRate(`${alphaCurrencyState.value}-${omegaCurrencyState.value}`.toLowerCase()) || 1
+  coefficientOmegaToAlpha.value =
+    store.getRate(`${omegaCurrencyState.value}-${alphaCurrencyState.value}`.toLowerCase()) || 1
 }
 
 const alphaCurrencyOnChange = async (event: Event): Promise<void> => {
@@ -89,10 +80,16 @@ const omegaCurrencyOnChange = async (event: Event): Promise<void> => {
 }
 
 const alphaCurrencyInput = (): void => {
+  if (isNaN(alphaCurrency.value) || alphaCurrency.value < 0) {
+    return
+  }
   omegaCurrency.value = Math.round(alphaCurrency.value * coefficientAlphaToOmega.value * 100) / 100
 }
 
 const omegaCurrencyInput = (): void => {
+  if (isNaN(omegaCurrency.value) || omegaCurrency.value < 0) {
+    return
+  }
   alphaCurrency.value = Math.round(omegaCurrency.value * coefficientOmegaToAlpha.value * 100) / 100
 }
 
@@ -102,7 +99,6 @@ onMounted(async (): Promise<void> => {
 </script>
 
 <style lang="scss" scoped>
-/* Стили остаются без изменений */
 input[type='number']::-webkit-inner-spin-button {
   display: none;
 }

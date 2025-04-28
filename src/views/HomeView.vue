@@ -5,59 +5,52 @@
       <span class="variant_bold">1</span> {{ item.txt }} =
       <span class="variant_bold">{{ item.value }}</span> {{ selectedCurrency }}
     </div>
-    <div v-if="loading" class="home__loader">
+    <div v-if="isLoading" class="home__loader">
       <div class="loader"></div>
+    </div>
+    <div v-if="store.error" class="error">
+      {{ store.error }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { currencies, currencyGetUrl as url } from '@/utils/helper.ts'
+import { computed, onMounted, ref } from 'vue'
+import { currencies } from '@/utils/helper.ts'
 import { useCurrencyStore } from '@/stores/currencyStore'
+import { storeToRefs } from 'pinia'
 
 interface CurrencyVariant {
   txt: string
   value: number
 }
 
-interface CurrencyResponse {
-  [key: string]: number
-}
-
 const store = useCurrencyStore()
-const variants = ref<CurrencyVariant[]>([])
-const selectedCurrency = ref<string>('')
-const loading = ref<boolean>(false)
+const { selectedCurrency } = storeToRefs(store)
+const isLoading = ref<boolean>(false)
 
-const otherCurrencies = (): string[] =>
-  currencies.filter((item: string) => item !== store.selectedCurrency)
+const variants = computed<CurrencyVariant[]>(() => {
+  return currencies
+    .filter((item) => item !== store.selectedCurrency)
+    .map((currency) => ({
+      value: store.getRate(`${currency}-${store.selectedCurrency}`.toLowerCase()),
+      txt: currency,
+    }))
+})
 
-const updateCurrency = async (): Promise<void> => {
-  loading.value = true
+const loadData = async () => {
   try {
-    const response = await fetch(url)
-    const result: CurrencyResponse = await response.json()
-
-    variants.value = []
-    otherCurrencies().forEach((currency: string) => {
-      const item: CurrencyVariant = {
-        value: result[`${currency}-${store.selectedCurrency}`.toLowerCase()] || 0,
-        txt: currency,
-      }
-      variants.value.push(item)
-    })
-    selectedCurrency.value = store.selectedCurrency
-    loading.value = false
-  } catch (e: unknown) {
-    console.warn(e)
-    loading.value = false
+    isLoading.value = true
+    await store.loadRates()
+  } finally {
+    isLoading.value = false
   }
 }
 
-store.$subscribe(updateCurrency)
-onMounted(async (): Promise<void> => {
-  await updateCurrency()
+onMounted(() => {
+  if (Object.keys(store.rates).length === 0) {
+    loadData()
+  }
 })
 </script>
 
